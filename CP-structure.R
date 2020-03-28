@@ -15,10 +15,10 @@ cp_set <- function (G, beta, alpha) {
   
   U$rd = compute_RD (U$nodes, G, alpha)
   
-  plot (x = c(1:34) , y = U$rd, type = "l")
+  plot (x = c(1:length (V(G))) , y = U$rd, type = "l")
   
-  #Cset = FindCoreSet (G, U, beta)
-  #CPset = FindCPSet (G, Cset, NumC)
+  Cset = FindCoreSet (G, U, beta, alpha)
+  CPset = FindCPSet (G, Cset, NumC)
 }
 
 
@@ -82,4 +82,29 @@ compute_RD <- function (U, lg, alpha) {
 
 CD <- function (lg) {
   return ((2* length (E(lg))) / (length (V(lg)) * (length (V(lg)) - 1)))
+}
+
+
+FindCoreSet <- function (lg, U, beta, alpha) {
+  
+  CoreSet = list ()
+  numC = 1
+  core = c ()
+  
+  for (i in alpha:length (U$nodes)) {
+    
+    if (U$rd [i] >= beta)
+      core = union (core, c (U$nodes [(i-alpha+1):i]))
+    else
+      if (U$rd [i - 1] >= beta && i > alpha) {
+        CoreSet [[numC]] = core
+        numC = numC + 1
+        core = c ()
+      }
+  }
+  
+  if (U$rd [length (U$nodes)] < beta)
+    numC = numC - 1
+  
+  return (CoreSet)
 }
