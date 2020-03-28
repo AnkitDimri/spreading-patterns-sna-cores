@@ -9,6 +9,7 @@ cp_set (g, 0.9)
 cp_set <- function (G, beta) {
   
   # Rank the nodes
+  U = c()
   U$nodes = rerank_nodes (G)
   k = (2 * length (E(G))) / length (V(G))
   
@@ -24,28 +25,31 @@ rerank_nodes <- function (lg) {
   
   # Rank the given nodes
   # Use any centrality measure for finding the first node; we used: betweeness
-  U = c (which.max (igraph::betweeness (lg)))
+  U = c()
+  U$n = c (which.max (igraph::betweeness (lg)))
   count = 1
+  maxD = max (igraph::degree (lg))
   # Populate neighbours group
-  ng = c(neighbors (lg, U [1]))
+  ng = c()
+  ng$p = c()
+  ng$n = c(neighbors (lg, U [1]))
   
   while (count != length (V(lg))) {
     
-    for (i in 1:length (ng)) {
-      
-    }
+    ng$p = c()
+    for (i in 1:length (ng$n))
+      ng$p = c (ng$p, length (intersect (neighbors (lg, ng$n [i]), U$n)) + (igraph::degree (lg, ng$n [i]) / maxD))
     
+    add_node = ng$n [which.max (ng$p)]
+    # add to list
+    U$n = c (U$n, add_node)
     # repopulate neighbours group
-    for (i in 1:length (U)) {
-      n = neighbors (lg, U [i])
-      for (j in 1:length (n)) {
-        if (!(n [i] %in% U)) {
-          ng = c (ng, n)
-        } 
-      }
-    }
-    
+    # remove from neighbours group
+    ng$n = ng$n [ng$n != add_node]
+    # add its neighbours to the group
+    ng$n = c (ng$n, neighbors (lg, add_node))
     
   }
   
+  return (U$n)
 }
