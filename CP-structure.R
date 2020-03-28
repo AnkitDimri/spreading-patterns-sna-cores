@@ -17,8 +17,8 @@ cp_set <- function (G, beta, alpha) {
   
   plot (x = c(1:length (V(G))) , y = U$rd, type = "l")
   
-  Cset = FindCoreSet (G, U, beta, alpha)
-  CPset = FindCPSet (G, Cset, NumC)
+  Cset = FindCoreSet (U, beta, alpha)
+  CPset = FindCPSet (G, Cset)
 }
 
 
@@ -85,7 +85,7 @@ CD <- function (lg) {
 }
 
 
-FindCoreSet <- function (lg, U, beta, alpha) {
+FindCoreSet <- function (U, beta, alpha) {
   
   CoreSet = list ()
   numC = 1
@@ -107,4 +107,9 @@ FindCoreSet <- function (lg, U, beta, alpha) {
     numC = numC - 1
   
   return (CoreSet)
+}
+
+
+FindCPSet <- function (lg, Cset) {
+  
 }
