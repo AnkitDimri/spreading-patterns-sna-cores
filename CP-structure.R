@@ -131,33 +131,42 @@ FindCPSet <- function (lg, Cset) {
     ng = c (ng$n, add_n)
   }
   
-  new_ng = c ()
-  # for complete set of neighbouring vertices
-  for (i in 1:length (ng)) {
-    n =  neighbors (lg, ng [i])
-    n = n [n %in% intersect (n, U)]
-    
-    count_c = c () # count connections
-    for (j in 1:numC) {
-      count_c = c (count_c, length (intersect (Cset [[j]], n)))
-    }
-    cp = which (count_c %in% max (count_c))
-    if (length (cp) > 1)
-      active = c (active, ng [i])
-    
-    for (j in 1:length (cp)) {
-      CPSet [[cp [j]]] [[level]] = c (CPSet [[cp [j]]] [[level]], ng [i]) 
-    }
-    
-    # remove the neighbour
-    ng = ng [ng != ng [i]]
-    # add new neighbours
-    n = neighbors (lg, ng [i])
-    new_ng = c (new_ng, n [! n %in% union (intersect (n, U), union (intersect (n, ng), intersect (n, new_ng)))])
-  } # for every neighbour
   
-  # create new neighboouring group
-  ng = new_ng
+  while (length (ng) != 0) {
+    
+    new_ng = c ()
+    # for complete set of neighbouring vertices
+    for (i in 1:length (ng)) {
+      n =  neighbors (lg, ng [i])
+      n = n [n %in% intersect (n, U)]
+      
+      count_c = c () # count connections
+      for (j in 1:numC) {
+        count_c = c (count_c, length (intersect (Cset [[j]], n)))
+      }
+      cp = which (count_c %in% max (count_c))
+      if (length (cp) > 1)
+        active = c (active, ng [i])
+      
+      for (j in 1:length (cp)) {
+        CPSet [[cp [j]]] [[level]] = c (CPSet [[cp [j]]] [[level]], ng [i]) 
+      }
+      
+      # remove the neighbour
+      ng = ng [ng != ng [i]]
+      # add new neighbours
+      n = neighbors (lg, ng [i])
+      new_ng = c (new_ng, n [! n %in% union (intersect (n, U), union (intersect (n, ng), intersect (n, new_ng)))])
+      # add it in U
+      U = c (U, ng [i])
+    } # for every neighbour
+    
+    # create new neighboouring group
+    ng = new_ng
+    level = level + 1
+    
+  }
+  
   
   
   
