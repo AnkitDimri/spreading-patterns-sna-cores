@@ -112,4 +112,62 @@ FindCoreSet <- function (U, beta, alpha) {
 
 FindCPSet <- function (lg, Cset) {
   
+  
+  numC = length (Cset)
+  U = c ()
+  ng = c ()
+  active = c ()
+  level = 1
+  CPSet = list ()
+  
+  # get all the vertex in the core sets
+  for (i in 1:numC)
+    U = c (U, Cset [[i]])
+  
+  # get neighbours group
+  for (i in 1:length (U)) {
+    n = neighbors (lg, U [i])
+    add_n = n [! n %in% union (intersect (n, U), intersect (n, ng))]
+    ng = c (ng$n, add_n)
+  }
+  
+  new_ng = c ()
+  # for complete set of neighbouring vertices
+  for (i in 1:length (ng)) {
+    n =  neighbors (lg, ng [i])
+    n = n [n %in% intersect (n, U)]
+    
+    count_c = c () # count connections
+    for (j in 1:numC) {
+      count_c = c (count_c, length (intersect (Cset [[j]], n)))
+    }
+    cp = which (count_c %in% max (count_c))
+    if (length (cp) > 1)
+      active = c (active, ng [i])
+    
+    for (j in 1:length (cp)) {
+      CPSet [[cp [j]]] [[level]] = c (CPSet [[cp [j]]] [[level]], ng [i]) 
+    }
+    
+    # remove the neighbour
+    ng = ng [ng != ng [i]]
+    # add new neighbours
+    n = neighbors (lg, ng [i])
+    new_ng = c (new_ng, n [! n %in% union (intersect (n, U), union (intersect (n, ng), intersect (n, new_ng)))])
+  } # for every neighbour
+  
+  # create new neighboouring group
+  ng = new_ng
+  
+  
+  
+  # add its neighbours to the group
+  n = neighbors (lg, add_node)
+  add_n = n [! n %in% intersect (n, U$n)]
+  ng$n = c (ng$n, add_n)
 }
+
+
+
+active
+CPSet
