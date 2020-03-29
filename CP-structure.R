@@ -1,7 +1,7 @@
 library (igraph)
 
 g = read_graph ("~/ankit/projects/social network analysis/karate.gml", format = "gml")
-cp_set (g, 0.9, 4)
+
 #####################################################################################################################
 #                                               Main Function                                                       #
 #####################################################################################################################
@@ -18,7 +18,8 @@ cp_set <- function (G, beta, alpha) {
   plot (x = c(1:length (V(G))) , y = U$rd, type = "l")
   
   Cset = FindCoreSet (U, beta, alpha)
-  CPset = FindCPSet (G, Cset)
+  CPSet = FindCPSet (G, Cset)
+  print (CPSet)
 }
 
 
@@ -120,6 +121,10 @@ FindCPSet <- function (lg, Cset) {
   level = 1
   CPSet = list ()
   
+  # create CPSet
+  for (i in 1:numC) 
+    CPSet [[i]] = list ()
+  
   # get all the vertex in the core sets
   for (i in 1:numC)
     U = c (U, Cset [[i]])
@@ -128,16 +133,21 @@ FindCPSet <- function (lg, Cset) {
   for (i in 1:length (U)) {
     n = neighbors (lg, U [i])
     add_n = n [! n %in% union (intersect (n, U), intersect (n, ng))]
-    ng = c (ng$n, add_n)
+    ng = c (ng, add_n)
   }
-  
-  
+   
   while (length (ng) != 0) {
+   
+    # create level
+    for (j in 1:numC) {
+      CPSet [[j]] [[level]] = c (-1)
+    }
     
     new_ng = c ()
     # for complete set of neighbouring vertices
-    for (i in 1:length (ng)) {
-      n =  neighbors (lg, ng [i])
+    while (length (ng) != 0) {
+      
+      n =  neighbors (lg, ng [1])
       n = n [n %in% intersect (n, U)]
       
       count_c = c () # count connections
@@ -146,37 +156,31 @@ FindCPSet <- function (lg, Cset) {
       }
       cp = which (count_c %in% max (count_c))
       if (length (cp) > 1)
-        active = c (active, ng [i])
-      
+        active = c (active, ng [1])
+
+      # fill level
       for (j in 1:length (cp)) {
-        CPSet [[cp [j]]] [[level]] = c (CPSet [[cp [j]]] [[level]], ng [i]) 
+        CPSet [[cp [j]]] [[level]] = c (CPSet [[cp [j]]] [[level]], ng [1]) 
       }
       
-      # remove the neighbour
-      ng = ng [ng != ng [i]]
       # add new neighbours
-      n = neighbors (lg, ng [i])
+      n = neighbors (lg, ng [1])
       new_ng = c (new_ng, n [! n %in% union (intersect (n, U), union (intersect (n, ng), intersect (n, new_ng)))])
       # add it in U
-      U = c (U, ng [i])
+      U = c (U, ng [1])
+      # remove the neighbour
+      ng = ng [ng != ng [1]]
     } # for every neighbour
-    
+  
     # create new neighboouring group
     ng = new_ng
     level = level + 1
     
   }
   
+  # redistribute active vertices
   
-  
-  
-  # add its neighbours to the group
-  n = neighbors (lg, add_node)
-  add_n = n [! n %in% intersect (n, U$n)]
-  ng$n = c (ng$n, add_n)
+  return (CPSet)
 }
 
-
-
-active
-CPSet
+cp_set (g, 0.9, 4)
