@@ -200,6 +200,34 @@ FindCPSet <- function (lg, Cset) {
   }
   
   # redistribute active vertices
+  overlapping = c ()
+  for (i in 1:length (active)) {
+    n =  neighbors (lg, active [i])
+    n = n [! n %in% intersect (n, active)]
+    count_c = c ()
+    remove_cp = c ()
+    
+    count_c = c () # count connections
+    for (j in 1:numC) {
+      count_c = c (count_c, length (intersect (u_cset [[j]], n)))
+    }
+    cp = which (count_c %in% max (count_c))
+    if (length (cp) > 1)
+      overlapping = c (overlapping, active [i])
+    else {
+      remove_cp =  c(1:length (count_c))
+      remove_cp = remove_cp [! remove_cp %in% cp]
+      # remove the active nodes from the given cp sets
+      for (j in 1:length (remove_cp)) {
+        for (k in 1:length (CPSet [[remove_cp [j]]])) {
+          CPSet [[remove_cp [j]]] [[k]] = CPSet [[remove_cp [j]]] [[k]] [CPSet [[remove_cp [j]]] [[k]] != active [i]]
+        }
+      }
+    }
+  }
+  
+  # Print overlapping nodes
+  print (overlapping)
   
   return (CPSet)
 }
