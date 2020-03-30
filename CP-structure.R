@@ -148,6 +148,10 @@ FindCPSet <- function (lg, Cset) {
     }
     
     new_ng = c ()
+    u_cset_add = list ()
+    for (j in 1:numC)
+      u_cset_add [[j]] = c (-1)
+    
     # for complete set of neighbouring vertices
     while (length (ng) != 0) {
       
@@ -166,7 +170,7 @@ FindCPSet <- function (lg, Cset) {
       for (j in 1:length (cp)) {
         if (CPSet [[cp [j]]] [[level]] [1] == -1) {
           CPSet [[cp [j]]] [[level]] = c (CPSet [[cp [j]]] [[level]], ng [1])
-          u_cset [[cp [j]]] = c (u_cset [[cp [j]]], ng [1])
+          u_cset_add[[cp [j]]] = c (u_cset_add [[cp [j]]], ng [1])
           CPSet [[cp [j]]] [[level]] = CPSet [[cp [j]]] [[level]] [2:2]
         }
         else {
@@ -188,6 +192,10 @@ FindCPSet <- function (lg, Cset) {
     # create new neighboouring group
     ng = new_ng
     level = level + 1
+    for (j in 1:length (u_cset)) {
+      u_cset_add [[j]] == u_cset_add [[j]] [u_cset_add [[j]] != -1]
+      u_cset [[j]] = c (u_cset [[j]], u_cset_add [[j]])
+    } 
     
   }
   
