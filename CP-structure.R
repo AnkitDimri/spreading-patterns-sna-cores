@@ -1,7 +1,5 @@
 library (igraph)
 
-g = read_graph ("~/ankit/projects/social network analysis/karate.gml", format = "gml")
-
 #####################################################################################################################
 #                                               Main Function                                                       #
 #####################################################################################################################
@@ -11,6 +9,7 @@ cp_set <- function (G, beta, alpha) {
   # Rank the nodes
   U = c()
   U$nodes = rerank_nodes (G)
+  print (U)
   k = (2 * length (E(G))) / length (V(G))
   
   U$rd = compute_RD (U$nodes, G, alpha)
@@ -35,13 +34,13 @@ rerank_nodes <- function (lg) {
   # Rank the given nodes
   # Use any centrality measure for finding the first node; we used: betweeness
   U = c()
-  U$n = c (which.max (igraph::betweenness (lg)))
+  U$n = c (V (lg) [which.max (igraph::betweenness (lg)) [[1]]])
   count = 1
   maxD = max (igraph::degree (lg))
   # Populate neighbours group
   ng = c()
   ng$p = c()
-  ng$n = c(neighbors (lg, U [1]))
+  ng$n = c(neighbors (lg, U$n [1]))
   
   while (count != length (V(lg))) {
     
@@ -238,5 +237,15 @@ FindCPSet <- function (lg, Cset) {
   return (CPSet)
 }
 
+# KARATE CLUB (alpha = 4, beta = 0.9)
+g = read_graph ("~/ankit/projects/social network analysis/karate.gml", format = "gml")
 cp_set (g, 0.9, 4)
 
+# DOLPHIN NETWORK (alpha = 5, beta = 0.9)
+D = read.csv("~/ankit/projects/social network analysis/dolphin.csv", header = F)
+D = data.frame (D)
+gd = make_empty_graph (n = 62)
+for (x in 1:nrow (D))
+  gd = gd + edge (D [x, "V1"], D [x, "V2"])
+gd = as.undirected (gd, mode = "collapse")
+cp_set (gd, 1, 5)
