@@ -122,8 +122,12 @@ FindCPSet <- function (lg, Cset) {
   CPSet = list ()
   
   # create CPSet
-  for (i in 1:numC) 
+  for (i in 1:numC) {
     CPSet [[i]] = list ()
+  }
+  
+  # fill core vertices in universal CSet
+  u_cset = Cset
   
   # get all the vertex in the core sets
   for (i in 1:numC)
@@ -152,7 +156,7 @@ FindCPSet <- function (lg, Cset) {
       
       count_c = c () # count connections
       for (j in 1:numC) {
-        count_c = c (count_c, length (intersect (Cset [[j]], n)))
+        count_c = c (count_c, length (intersect (u_cset [[j]], n)))
       }
       cp = which (count_c %in% max (count_c))
       if (length (cp) > 1)
@@ -160,8 +164,17 @@ FindCPSet <- function (lg, Cset) {
 
       # fill level
       for (j in 1:length (cp)) {
-        CPSet [[cp [j]]] [[level]] = c (CPSet [[cp [j]]] [[level]], ng [1]) 
+        if (CPSet [[cp [j]]] [[level]] [1] == -1) {
+          CPSet [[cp [j]]] [[level]] = c (CPSet [[cp [j]]] [[level]], ng [1])
+          u_cset [[cp [j]]] = c (u_cset [[cp [j]]], ng [1])
+          CPSet [[cp [j]]] [[level]] = CPSet [[cp [j]]] [[level]] [2:2]
+        }
+        else {
+          CPSet [[cp [j]]] [[level]] = c (CPSet [[cp [j]]] [[level]], ng [1])
+          u_cset [[cp [j]]] = c (u_cset [[cp [j]]], ng [1]) 
+        }
       }
+      #print (u_cset)
       
       # add new neighbours
       n = neighbors (lg, ng [1])
@@ -184,3 +197,4 @@ FindCPSet <- function (lg, Cset) {
 }
 
 cp_set (g, 0.9, 4)
+
