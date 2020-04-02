@@ -9,8 +9,6 @@ cp_set <- function (G, beta, alpha) {
   # Rank the nodes
   U = c()
   U$nodes = rerank_nodes (G)
-  print("Ranked nodes in U :")
-  print(U$nodes)
   k = (2 * length (E(G))) / length (V(G))
   
   U$rd = compute_RD (U$nodes, G, alpha)
@@ -63,11 +61,12 @@ rerank_nodes <- function (lg) {
     n = neighbors (lg, add_node)
     add_n = n [! n %in% intersect (n, U$n)]
     ng$n = c (ng$n, add_n)
-    cat("\n\n  Neighbours : ",ng$n)
+    cat("\n\n  Neighbours\n : ",ng$n)
     count = count + 1
     
   }
-  
+  print("Ranked nodes in U :")
+  print(U$n)
   return (U$n)
 }
 
@@ -80,9 +79,7 @@ compute_RD <- function (U, lg, alpha) {
   for (i in 2:alpha) {
     if (i <= length (U)) {
       subg = c (subg, U [i])
-      CDD = CD (subgraph (lg, subg))
-      cat("\n\nSubgraph :",subg,"\n\n Connection Density : ",CDD)
-      rd = c (rd, CDD)
+      rd = c (rd,CD (subgraph (lg, subg)))
       
     }
   }
@@ -90,11 +87,9 @@ compute_RD <- function (U, lg, alpha) {
   for (i in (alpha+1):length (U)) {
     subg = subg [2:alpha]
     subg = c (subg, U [i])
-    CDD = CD (subgraph (lg, subg))
-    cat("\n\nSubgraph :",subg,"\n\n Connection Density : ",CDD)
-    rd = c (rd,CDD)
+    rd = c (rd,CD (subgraph (lg, subg)))
   }
-  
+  cat("\n\nRegion density of each node : ",rd)
   return (rd)
 }
 
