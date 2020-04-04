@@ -14,7 +14,8 @@ cp_set <- function (G, beta, alpha) {
   
   U$rd = compute_RD (U$nodes, G, alpha)
   
-  plot (x = c(1:length (V(G))) , y = U$rd, type = "l")
+  plot (x = c(1:length (V(G))) , y = U$rd, type = "l",xlab = "Rank",ylab = "RD")
+  text (x = c(1:length (V(G))), y = U$rd, labels = U$nodes,cex=0.9, font=2)
   
   Cset = FindCoreSet (U, beta, alpha)
   CPSet = FindCPSet (G, Cset)
