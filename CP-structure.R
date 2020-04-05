@@ -185,7 +185,6 @@ FindCPSet <- function (lg, Cset) {
           u_cset [[cp [j]]] = c (u_cset [[cp [j]]], ng [1]) 
         }
       }
-      #print (u_cset)
       
       # add new neighbours
       n = neighbors (lg, ng [1])
