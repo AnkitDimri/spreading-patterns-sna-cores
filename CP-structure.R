@@ -245,6 +245,7 @@ cp_set (g, 0.9, 4)
 D = read.csv("~/ankit/projects/social network analysis/dolphin.csv", header = F)
 D = data.frame (D)
 gd = make_empty_graph (n = 62)
+# To make graph sorted and traversable for function
 for (x in 1:nrow (D))
   gd = gd + edge (D [x, "V1"], D [x, "V2"])
 gd = as.undirected (gd, mode = "collapse")
