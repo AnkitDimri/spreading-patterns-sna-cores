@@ -13,8 +13,10 @@ cp_set <- function (G, beta, alpha) {
   
   U$rd = compute_RD (U$nodes, G, alpha)
   
-  plot (x = c(1:length (V(G))) , y = U$rd, type = "l",xlab = "Rank",ylab = "RD")
-  text (x = c(1:length (V(G))), y = U$rd, labels = U$nodes,cex=0.9, font=2)
+  x = c(1:length (V(G)))
+  plot (x, y = U$rd, type = "l",xlab = "Rank",ylab = "RD")
+  lines (x, y = beta + x * 0, col = "red")
+  text (x, y = U$rd, labels = U$nodes, cex=0.9, font=2)
 
   
   Cset = FindCoreSet (U, beta, alpha)
@@ -64,7 +66,6 @@ rerank_nodes <- function (lg) {
     
   }
   
-  print(U$n)
   return (U$n)
 }
 
