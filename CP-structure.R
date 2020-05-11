@@ -13,20 +13,36 @@ cp_set <- function (G, beta, alpha) {
   
   U$rd = compute_RD (U$nodes, G, alpha)
   
-  plot (x = c(1:length (V(G))) , y = U$rd, type = "l",xlab = "Rank",ylab = "RD")
-  text (x = c(1:length (V(G))), y = U$rd, labels = U$nodes,cex=0.9, font=2)
-
+  x = c(1:length (V(G)))
+  plot (x, y = U$rd, type = "l",xlab = "Rank",ylab = "RD")
+  lines (x, y = beta + x * 0, col = "red")
+  text (x, y = U$rd, labels = U$nodes, cex=0.9, font=2)
   
   Cset = FindCoreSet (U, beta, alpha)
   CPSet = FindCPSet (G, Cset)
   
+  regions = list ()
+  ri = 1
   # Print the CP structures
   for (i in 1:length (Cset)) {
     cat ("\n\n Core ", i, ": ", Cset [[i]])
-    for (j in 1:length (CPSet [[i]]))
+    regions [[ri]] = Cset [[i]]
+    ri = ri+1
+    unionset = Cset [[i]]
+    
+    for (j in 1:length (CPSet [[i]])) {
+      unionset = union (unionset, CPSet [[i]] [[j]])
       cat ("\n Level ", j, " :", CPSet [[i]] [[j]])
+      regions [[ri]] = unionset
+      ri = ri+1
+    }
   }
   cat ("\n\n Overlapping nodes: ", CPSet$overlapping, "\n\n")
+  
+  
+  layout <-layout.fruchterman.reingold(g)
+  plot (G, mark.groups = regions, layout = layout, edge.length = 100, vertex.size = 12)
+
 }
 
 
@@ -52,7 +68,6 @@ rerank_nodes <- function (lg) {
     add_node = ng$n [which.max (ng$p)]
     # add to list
     U$n = c (U$n, add_node)
-    cat("\n\n Nodes present in U : ",U$n)
     
     # repopulate neighbours group
     # remove from neighbours group
@@ -61,12 +76,10 @@ rerank_nodes <- function (lg) {
     n = neighbors (lg, add_node)
     add_n = n [! n %in% intersect (n, U$n)]
     ng$n = c (ng$n, add_n)
-    cat("\n\n  Neighbours\n : ",ng$n)
     count = count + 1
     
   }
-  print("Ranked nodes in U :")
-  print(U$n)
+  
   return (U$n)
 }
 
@@ -89,7 +102,6 @@ compute_RD <- function (U, lg, alpha) {
     subg = c (subg, U [i])
     rd = c (rd,CD (subgraph (lg, subg)))
   }
-  cat("\n\nRegion density of each node : ",rd)
   return (rd)
 }
 
@@ -244,11 +256,11 @@ FindCPSet <- function (lg, Cset) {
 }
 
 # KARATE CLUB (alpha = 4, beta = 0.9)
-g = read_graph ("/home/stark/Desktop/Clg/Sem 6/SNA/Project/Code/karate.gml", format = "gml")
+g = read_graph ("datasets/karate.gml", format = "gml")
 cp_set (g, 0.9, 4)
 
 # DOLPHIN NETWORK (alpha = 5, beta = 0.9)
-D = read.csv("/home/stark/Desktop/Clg/Sem 6/SNA/Project/Code/dolphin.csv", header = F)
+D = read.csv("", header = F)
 D = data.frame (D)
 gd = make_empty_graph (n = 62)
 # To make graph sorted and traversable for function
