@@ -17,18 +17,32 @@ cp_set <- function (G, beta, alpha) {
   plot (x, y = U$rd, type = "l",xlab = "Rank",ylab = "RD")
   lines (x, y = beta + x * 0, col = "red")
   text (x, y = U$rd, labels = U$nodes, cex=0.9, font=2)
-
   
   Cset = FindCoreSet (U, beta, alpha)
   CPSet = FindCPSet (G, Cset)
   
+  regions = list ()
+  ri = 1
   # Print the CP structures
   for (i in 1:length (Cset)) {
     cat ("\n\n Core ", i, ": ", Cset [[i]])
-    for (j in 1:length (CPSet [[i]]))
+    regions [[ri]] = Cset [[i]]
+    ri = ri+1
+    unionset = Cset [[i]]
+    
+    for (j in 1:length (CPSet [[i]])) {
+      unionset = union (unionset, CPSet [[i]] [[j]])
       cat ("\n Level ", j, " :", CPSet [[i]] [[j]])
+      regions [[ri]] = unionset
+      ri = ri+1
+    }
   }
   cat ("\n\n Overlapping nodes: ", CPSet$overlapping, "\n\n")
+  
+  
+  layout <-layout.fruchterman.reingold(g)
+  plot (G, mark.groups = regions, layout = layout, edge.length = 100, vertex.size = 12)
+
 }
 
 
