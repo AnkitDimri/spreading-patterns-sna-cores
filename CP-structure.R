@@ -9,13 +9,13 @@ cp_set <- function (G, beta, alpha) {
   # Rank the nodes
   U = c()
   U$nodes = rerank_nodes (G)
-  print (U)
   k = (2 * length (E(G))) / length (V(G))
   
   U$rd = compute_RD (U$nodes, G, alpha)
   
   plot (x = c(1:length (V(G))) , y = U$rd, type = "l",xlab = "Rank",ylab = "RD")
   text (x = c(1:length (V(G))), y = U$rd, labels = U$nodes,cex=0.9, font=2)
+
   
   Cset = FindCoreSet (U, beta, alpha)
   CPSet = FindCPSet (G, Cset)
@@ -52,6 +52,8 @@ rerank_nodes <- function (lg) {
     add_node = ng$n [which.max (ng$p)]
     # add to list
     U$n = c (U$n, add_node)
+    cat("\n\n Nodes present in U : ",U$n)
+    
     # repopulate neighbours group
     # remove from neighbours group
     ng$n = ng$n [ng$n != add_node]
@@ -59,10 +61,12 @@ rerank_nodes <- function (lg) {
     n = neighbors (lg, add_node)
     add_n = n [! n %in% intersect (n, U$n)]
     ng$n = c (ng$n, add_n)
+    cat("\n\n  Neighbours\n : ",ng$n)
     count = count + 1
     
   }
-  
+  print("Ranked nodes in U :")
+  print(U$n)
   return (U$n)
 }
 
@@ -75,20 +79,22 @@ compute_RD <- function (U, lg, alpha) {
   for (i in 2:alpha) {
     if (i <= length (U)) {
       subg = c (subg, U [i])
-      rd = c (rd, CD (subgraph (lg, subg)))
+      rd = c (rd,CD (subgraph (lg, subg)))
+      
     }
   }
-
+  
   for (i in (alpha+1):length (U)) {
     subg = subg [2:alpha]
     subg = c (subg, U [i])
-    rd = c (rd, CD (subgraph (lg, subg)))
+    rd = c (rd,CD (subgraph (lg, subg)))
   }
-
+  cat("\n\nRegion density of each node : ",rd)
   return (rd)
 }
 
 CD <- function (lg) {
+  
   return ((2* length (E(lg))) / (length (V(lg)) * (length (V(lg)) - 1)))
 }
 
@@ -146,9 +152,9 @@ FindCPSet <- function (lg, Cset) {
     add_n = n [! n %in% union (intersect (n, U), intersect (n, ng))]
     ng = c (ng, add_n)
   }
-   
+  
   while (length (ng) != 0) {
-   
+    
     # create level
     for (j in 1:numC) {
       CPSet [[j]] [[level]] = c (-1)
@@ -172,7 +178,7 @@ FindCPSet <- function (lg, Cset) {
       cp = which (count_c %in% max (count_c))
       if (length (cp) > 1)
         active = c (active, ng [1])
-
+      
       # fill level
       for (j in 1:length (cp)) {
         if (CPSet [[cp [j]]] [[level]] [1] == -1) {
@@ -194,7 +200,7 @@ FindCPSet <- function (lg, Cset) {
       # remove the neighbour
       ng = ng [ng != ng [1]]
     } # for every neighbour
-  
+    
     # create new neighboouring group
     ng = new_ng
     level = level + 1
@@ -238,15 +244,15 @@ FindCPSet <- function (lg, Cset) {
 }
 
 # KARATE CLUB (alpha = 4, beta = 0.9)
-g = read_graph ("~/ankit/projects/social network analysis/karate.gml", format = "gml")
+g = read_graph ("/home/stark/Desktop/Clg/Sem 6/SNA/Project/Code/karate.gml", format = "gml")
 cp_set (g, 0.9, 4)
 
 # DOLPHIN NETWORK (alpha = 5, beta = 0.9)
-D = read.csv("~/ankit/projects/social network analysis/dolphin.csv", header = F)
+D = read.csv("/home/stark/Desktop/Clg/Sem 6/SNA/Project/Code/dolphin.csv", header = F)
 D = data.frame (D)
 gd = make_empty_graph (n = 62)
 # To make graph sorted and traversable for function
 for (x in 1:nrow (D))
   gd = gd + edge (D [x, "V1"], D [x, "V2"])
 gd = as.undirected (gd, mode = "collapse")
-cp_set (gd, 1, 5)
+cp_set (gd, 1, 5) 
