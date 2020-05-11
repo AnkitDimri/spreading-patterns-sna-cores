@@ -15,7 +15,7 @@ cp_set <- function (G, beta, alpha) {
   
   plot (x = c(1:length (V(G))) , y = U$rd, type = "l",xlab = "Rank",ylab = "RD")
   text (x = c(1:length (V(G))), y = U$rd, labels = U$nodes,cex=0.9, font=2)
-  
+
   
   Cset = FindCoreSet (U, beta, alpha)
   CPSet = FindCPSet (G, Cset)
@@ -191,7 +191,6 @@ FindCPSet <- function (lg, Cset) {
           u_cset [[cp [j]]] = c (u_cset [[cp [j]]], ng [1]) 
         }
       }
-      #print (u_cset)
       
       # add new neighbours
       n = neighbors (lg, ng [1])
@@ -252,6 +251,7 @@ cp_set (g, 0.9, 4)
 D = read.csv("/home/stark/Desktop/Clg/Sem 6/SNA/Project/Code/dolphin.csv", header = F)
 D = data.frame (D)
 gd = make_empty_graph (n = 62)
+# To make graph sorted and traversable for function
 for (x in 1:nrow (D))
   gd = gd + edge (D [x, "V1"], D [x, "V2"])
 gd = as.undirected (gd, mode = "collapse")
