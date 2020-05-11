@@ -20,6 +20,7 @@ cp_set <- function (G, beta, alpha) {
   
   Cset = FindCoreSet (U, beta, alpha)
   CPSet = FindCPSet (G, Cset)
+  newlist <- list("cset" = Cset,"cpset" = CPSet)
   
   regions = list ()
   ri = 1
@@ -42,7 +43,9 @@ cp_set <- function (G, beta, alpha) {
   
   layout <-layout.fruchterman.reingold(g)
   plot (G, mark.groups = regions, layout = layout, edge.length = 100, vertex.size = 12)
-
+  
+  return(newlist)
+  
 }
 
 
@@ -257,7 +260,23 @@ FindCPSet <- function (lg, Cset) {
 
 # KARATE CLUB (alpha = 4, beta = 0.9)
 g = read_graph ("datasets/karate.gml", format = "gml")
-cp_set (g, 0.9, 4)
+op<-cp_set (g, 0.9, 4)
+
+get_col <- c("red","green","yellow","blue","purple","orange","cyan","pink","lightblue","lightgreen","deepskyblue4","darkseagreen3")
+col <- c()
+index = 1
+for(i in 1:length(op$cset)){
+  col[op$cset[[i]]] <- c(get_col[index])
+  index = index + 1
+}
+for(i in 1:(length(op$cpset))){
+  for(j in 1:length(op$cpset[[i]])){
+    col[op$cpset[[i]][[j]]] <- c(get_col[index])
+    index = index + 1
+  }
+  
+}
+plot(g,layout = layout.kamada.kawai,vertex.color=col)
 
 # DOLPHIN NETWORK (alpha = 5, beta = 0.9)
 D = read.csv("", header = F)
@@ -267,4 +286,4 @@ gd = make_empty_graph (n = 62)
 for (x in 1:nrow (D))
   gd = gd + edge (D [x, "V1"], D [x, "V2"])
 gd = as.undirected (gd, mode = "collapse")
-cp_set (gd, 1, 5) 
+cp_set (gd, 1, 5)
