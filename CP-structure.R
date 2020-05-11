@@ -52,7 +52,6 @@ rerank_nodes <- function (lg) {
     add_node = ng$n [which.max (ng$p)]
     # add to list
     U$n = c (U$n, add_node)
-    cat("\n\n Nodes present in U : ",U$n)
     
     # repopulate neighbours group
     # remove from neighbours group
@@ -61,11 +60,10 @@ rerank_nodes <- function (lg) {
     n = neighbors (lg, add_node)
     add_n = n [! n %in% intersect (n, U$n)]
     ng$n = c (ng$n, add_n)
-    cat("\n\n  Neighbours\n : ",ng$n)
     count = count + 1
     
   }
-  print("Ranked nodes in U :")
+  
   print(U$n)
   return (U$n)
 }
@@ -89,7 +87,6 @@ compute_RD <- function (U, lg, alpha) {
     subg = c (subg, U [i])
     rd = c (rd,CD (subgraph (lg, subg)))
   }
-  cat("\n\nRegion density of each node : ",rd)
   return (rd)
 }
 
@@ -244,11 +241,11 @@ FindCPSet <- function (lg, Cset) {
 }
 
 # KARATE CLUB (alpha = 4, beta = 0.9)
-g = read_graph ("/home/stark/Desktop/Clg/Sem 6/SNA/Project/Code/karate.gml", format = "gml")
+g = read_graph ("datasets/karate.gml", format = "gml")
 cp_set (g, 0.9, 4)
 
 # DOLPHIN NETWORK (alpha = 5, beta = 0.9)
-D = read.csv("/home/stark/Desktop/Clg/Sem 6/SNA/Project/Code/dolphin.csv", header = F)
+D = read.csv("", header = F)
 D = data.frame (D)
 gd = make_empty_graph (n = 62)
 # To make graph sorted and traversable for function
