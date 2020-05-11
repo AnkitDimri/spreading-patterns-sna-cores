@@ -22,27 +22,13 @@ cp_set <- function (G, beta, alpha) {
   CPSet = FindCPSet (G, Cset)
   newlist <- list("cset" = Cset,"cpset" = CPSet)
   
-  regions = list ()
-  ri = 1
   # Print the CP structures
   for (i in 1:length (Cset)) {
     cat ("\n\n Core ", i, ": ", Cset [[i]])
-    regions [[ri]] = Cset [[i]]
-    ri = ri+1
-    unionset = Cset [[i]]
-    
-    for (j in 1:length (CPSet [[i]])) {
-      unionset = union (unionset, CPSet [[i]] [[j]])
+    for (j in 1:length (CPSet [[i]]))
       cat ("\n Level ", j, " :", CPSet [[i]] [[j]])
-      regions [[ri]] = unionset
-      ri = ri+1
-    }
   }
   cat ("\n\n Overlapping nodes: ", CPSet$overlapping, "\n\n")
-  
-  
-  layout <-layout.fruchterman.reingold(g)
-  plot (G, mark.groups = regions, layout = layout, edge.length = 100, vertex.size = 12)
   
   return(newlist)
   
@@ -276,14 +262,69 @@ for(i in 1:(length(op$cpset))){
   }
   
 }
-plot(g,layout = layout.kamada.kawai,vertex.color=col)
+
+regions = list()
+ri = 1
+for (i in 1:length (op$cset)) {
+  regions [[ri]] = op$cset [[i]]
+  ri = ri+1
+  unionset = op$cset [[i]]
+  
+  for (j in 1:length (op$cpset [[i]])) {
+    unionset = union (unionset, op$cpset [[i]] [[j]])
+    regions [[ri]] = unionset
+    ri = ri+1
+  }
+}
+
+layoutt <-layout.fruchterman.reingold(g)
+plot (as.directed(g, mode = c ("mutual")), mark.groups = regions, layout = layoutt, vertex.color = col, edge.arrow.size = 0, xlim = c(ceiling (min (layoutt [,1])), ceiling (max (layoutt [,1]))), ylim = c(ceiling (min (layoutt [,2])), ceiling (max (layoutt [,2]))), rescale = F, vertex.size = 50)
+
+
+
+
+
 
 # DOLPHIN NETWORK (alpha = 5, beta = 0.9)
-D = read.csv("", header = F)
+D = read.csv("datasets/dolphin.csv", header = F)
 D = data.frame (D)
 gd = make_empty_graph (n = 62)
 # To make graph sorted and traversable for function
 for (x in 1:nrow (D))
   gd = gd + edge (D [x, "V1"], D [x, "V2"])
 gd = as.undirected (gd, mode = "collapse")
-cp_set (gd, 1, 5)
+op = cp_set (gd, 0.9, 5)
+
+
+get_col <- c("red","green","yellow","blue","purple","orange","cyan","pink","lightblue","lightgreen","deepskyblue4","darkseagreen3")
+col <- c()
+index = 1
+for(i in 1:length(op$cset)){
+  col[op$cset[[i]]] <- c(get_col[index])
+  index = index + 1
+}
+for(i in 1:(length(op$cpset))){
+  for(j in 1:length(op$cpset[[i]])){
+    col[op$cpset[[i]][[j]]] <- c(get_col[index])
+    index = index + 1
+  }
+  
+}
+
+regions = list()
+ri = 1
+for (i in 1:length (op$cset)) {
+  regions [[ri]] = op$cset [[i]]
+  ri = ri+1
+  unionset = op$cset [[i]]
+  
+  for (j in 1:length (op$cpset [[i]])) {
+    unionset = union (unionset, op$cpset [[i]] [[j]])
+    regions [[ri]] = unionset
+    ri = ri+1
+  }
+}
+
+layoutt <-layout.fruchterman.reingold(gd)
+plot (as.directed(gd, mode = c ("mutual")), mark.groups = regions, layout = layoutt, vertex.color = col, edge.arrow.size = 0, xlim = c(ceiling (min (layoutt [,1])), ceiling (max (layoutt [,1]))), ylim = c(ceiling (min (layoutt [,2])), ceiling (max (layoutt [,2]))), rescale = F, vertex.size = 50)
+
