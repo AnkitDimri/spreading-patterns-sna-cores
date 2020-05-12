@@ -280,6 +280,9 @@ for (i in 1:length (op$cset)) {
 layoutt <-layout.fruchterman.reingold(g)
 plot (as.directed(g, mode = c ("mutual")), mark.groups = regions, layout = layoutt, vertex.color = col, edge.arrow.size = 0, xlim = c(ceiling (min (layoutt [,1])), ceiling (max (layoutt [,1]))), ylim = c(ceiling (min (layoutt [,2])), ceiling (max (layoutt [,2]))), rescale = F, vertex.size = 50)
 
+adj = get.adjacency (g)
+heatmap (as.matrix(adj), Rowv = NA, Colv = NA, scale="none")
+
 
 
 
@@ -327,4 +330,27 @@ for (i in 1:length (op$cset)) {
 
 layoutt <-layout.fruchterman.reingold(gd)
 plot (as.directed(gd, mode = c ("mutual")), mark.groups = regions, layout = layoutt, vertex.color = col, edge.arrow.size = 0, xlim = c(ceiling (min (layoutt [,1])), ceiling (max (layoutt [,1]))), ylim = c(ceiling (min (layoutt [,2])), ceiling (max (layoutt [,2]))), rescale = F, vertex.size = 50)
+
+
+adj1 = get.adjacency (as.undirected(gd))
+heatmap (as.matrix(adj1), Rowv = NA, Colv = NA, scale="none", revC = T)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################## USA AIRPORT
+
+D = read.delim ("~/Downloads/USairport500.txt", header = F, sep = " ")
+D = data.frame (D [)
+gd = make_empty_graph (n = 62)
 
