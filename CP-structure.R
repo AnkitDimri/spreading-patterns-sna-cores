@@ -20,13 +20,42 @@ cp_set <- function (G, beta, alpha) {
   
   Cset = FindCoreSet (U, beta, alpha)
   CPSet = FindCPSet (G, Cset)
+
   # Remove empty levels
   for (i in 1:length (Cset))
     for (j in 1:length (CPSet [[i]]))
-      if (CPSet [[i]] [[j]] == -1) {
+      if (CPSet [[i]] [[j]] == -1 || length (CPSet [[i]] [[j]])  == 0) {
         CPSet [[i]] = CPSet [[i]] [[1:(j-1)]]
         break
       }
+  
+  # Make adjacency matrix representation
+  mat = matrix (0, nrow = length (V (G)), ncol = length (V (G)))
+  for (i in 1:length (Cset)) {
+    for (j in 1:length (Cset [[i]])) {
+      for (k in 1:length (Cset [[i]])) {
+        if (are.connected (G, Cset [[i]] [j], Cset [[i]] [k]))
+          mat [Cset [[i]] [j], Cset [[i]] [k]] = 1
+      }
+    }
+  }
+  
+  for (i in 1:length (Cset)) {
+    level_abv = Cset [[i]]
+    for (j in 1:length (CPSet [[i]])) {
+      for (k in 1:length (CPSet [[i]] [[j]])) {
+        for (l in 1:length (level_abv)) {
+          if (are.connected (G, CPSet [[i]] [[j]] [k], level_abv [l])) {
+            mat [CPSet [[i]] [[j]] [k], level_abv [l]] = 1
+            mat [level_abv [l], CPSet [[i]] [[j]] [k]] = 1
+          }
+        }
+      }
+      level_abv = CPSet [[i]] [[j]]
+    }
+  }
+  
+  heatmap (mat, Rowv = NA, Colv = NA, scale="none")
   
   # Print the CP structures
   for (i in 1:length (Cset)) {
@@ -292,9 +321,6 @@ for (i in 1:length (op$cset)) {
 
 layoutt <-layout.fruchterman.reingold(g)
 plot (as.directed(g, mode = c ("mutual")), mark.groups = regions, layout = layoutt, vertex.color = col, edge.arrow.size = 0, xlim = c(ceiling (min (layoutt [,1])), ceiling (max (layoutt [,1]))), ylim = c(ceiling (min (layoutt [,2])), ceiling (max (layoutt [,2]))), rescale = F, vertex.size = 50)
-
-adj = get.adjacency (g)
-heatmap (as.matrix(adj), Rowv = NA, Colv = NA, scale="none")
 
 
 
